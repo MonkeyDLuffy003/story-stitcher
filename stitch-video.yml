@@ -1,0 +1,42 @@
+# WHERE THIS FILE GOES:
+# Put this file at: .github/workflows/stitch-video.yml   in your repo
+#
+# HOW TO USE FROM YOUR PHONE:
+# 1. In your repo, make a folder called "clips" and upload your clips there,
+#    named clip1.mp4, clip2.mp4, clip3.mp4, etc. (in the order you want them to play)
+# 2. (Optional) upload one music file to the repo root named music.mp3
+# 3. Commit the changes — this workflow runs automatically
+# 4. Go to the "Actions" tab in your repo, open the latest run, scroll to
+#    "Artifacts" at the bottom, and download "final-video" — that's your finished video.
+
+name: Stitch Video Clips
+
+on:
+  push:
+    paths:
+      - 'clips/**'
+  workflow_dispatch: {}   # lets you also trigger it manually from the Actions tab
+
+jobs:
+  stitch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run stitch script
+        run: python3 stitch.py
+
+      - name: Upload finished video
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-video
+          path: output/final.mp4
